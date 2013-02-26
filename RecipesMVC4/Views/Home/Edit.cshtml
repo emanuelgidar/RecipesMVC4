@@ -1,0 +1,50 @@
+﻿@model RecipesMVC4.Models.Recipe
+
+@{
+    ViewBag.Title = "Edit Recipe";
+}
+
+<h2>Edit Recipe</h2>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>Recipe</legend>
+
+        @Html.HiddenFor(model => model.ID)
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Title)
+        </div>
+        <div>
+            @Html.DisplayTextFor(model => model.Title)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Description)
+        </div>
+        <div>
+            @Html.DisplayTextFor(model => model.Description)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.isIncorrect)
+        </div>
+
+        <div class="editor-field">
+            @Html.EditorFor(model => model.isIncorrect)
+            @Html.ValidationMessageFor(model => model.isIncorrect)
+        </div>
+        <br />
+        <p>
+            <input type="submit" class="btn btn-primary" value="Save" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+
