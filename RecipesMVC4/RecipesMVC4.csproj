@@ -219,6 +219,7 @@
     <Content Include="Views\Admin\Indexx.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\Edit.cshtml" />
+    <Content Include="Views\shared\_LoginPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -15,19 +15,10 @@ namespace RecipesMVC4
         {
             routes.MapNavigationRoute<HomeController>("Home", c => c.Index());
 
-            routes.MapNavigationRoute<AccountController>("Register", c => c.Register(null));
-
-            routes.MapNavigationRoute<AccountController>("Login", c => c.SignIn(null));
-
-                 //   .AddChildRoute<AccountController>("Register", c => c.Register(null))
-                  //  .AddChildRoute<AccountController>("Login", c => c.SignIn(null));
-                 //   .AddChildRoute<AccountController>("SignIn", c => c.SignIn(null));
-
-          //  routes.MapNavigationRoute<ExampleLayoutsController>("Example Layouts", c => c.Starter())
-          //        .AddChildRoute<ExampleLayoutsController>("Marketing", c => c.Marketing())
-          //        .AddChildRoute<ExampleLayoutsController>("Fluid", c => c.Fluid())
-            //      .AddChildRoute<ExampleLayoutsController>("Sign In", c => c.SignIn())
-                //;
+            
+            routes.MapNavigationRoute<AdminController>("Admin", c => c.Details(Guid.NewGuid()))
+                .AddChildRoute<AdminController>("List Recipes", c => c.Index())
+               .AddChildRoute<AdminController>("Create Recipe", c => c.Create(null));
         }
     }
 }

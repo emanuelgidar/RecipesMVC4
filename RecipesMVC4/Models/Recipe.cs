@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System;
 
 namespace RecipesMVC4.Models
 {
     public class Recipe
     {
-        public int ID { get; set; }
+        public Guid ID { get; set; }
 
         [Required(ErrorMessage = "Title Required")]
         [StringLength(25, ErrorMessage = "Must be less than 25 characters")]

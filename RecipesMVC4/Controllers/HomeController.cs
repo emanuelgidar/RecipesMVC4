@@ -2,6 +2,7 @@
 using RecipesMVC4.Models;
 using System.Linq;
 using System.Web.Mvc;
+using System;
 
 namespace RecipesMVC4.Controllers
 {
@@ -19,25 +20,25 @@ namespace RecipesMVC4.Controllers
             return View(_documentSession.Query<Recipe>().OrderBy(x => x.ID).ToList());
         }
 
-        public ActionResult Details(int id)
+        public ActionResult Details(Guid id)
         {
             var recipe = _documentSession.Query<Recipe>().SingleOrDefault(recipeQuery => recipeQuery.ID == id);
 
             if (recipe == null)
             {
-                TempData["Message"] = string.Format("Recipe {0} not found", id);
+                TempData["Error"] = string.Format("Recipe {0} not found", id);
                 return RedirectToAction("Index");
             }
             return View(recipe);
         }
 
         // GET: /Home/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(Guid id)
         {
             var recipe = _documentSession.Query<Recipe>().SingleOrDefault(recipeQuery => recipeQuery.ID == id);
             if (recipe == null)
             {
-                TempData["Message"] = string.Format("Recipe {0} not found", id);
+                TempData["Error"] = string.Format("Recipe {0} not found", id);
                 return RedirectToAction("Index");
             }
             return View(recipe);
@@ -50,7 +51,7 @@ namespace RecipesMVC4.Controllers
             var doc = _documentSession.Query<Recipe>().SingleOrDefault(recipeQuery => recipeQuery.ID == recipe.ID);
             doc.isIncorrect = recipe.isIncorrect;
             _documentSession.SaveChanges();
-            TempData["Message"] = string.Format("Saved changes to Recipe {0}", recipe.Title);
+            TempData["Success"] = string.Format("Saved changes to Recipe {0}", recipe.Title);
 
             return RedirectToAction("Index");
         }

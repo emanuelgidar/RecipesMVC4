@@ -5,7 +5,14 @@
 }
 
 <h2>Register</h2>
-@ViewBag.ErrorMessage
+@using (Html.BeginForm()) {
+    if ( ViewBag.ErrorMessage != null)
+    {
+    <div class="alert alert-error">
+    @ViewBag.ErrorMessage
+    </div>
+}
+}
 @using (Html.BeginForm()) {
     @Html.ValidationSummary(true)
 

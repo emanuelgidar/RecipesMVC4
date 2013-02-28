@@ -6,6 +6,8 @@ using RecipesMVC4.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using System;
+using Raven.Client;
 
 namespace RecipesMVC4.Tests.ControllerTests
 {
@@ -13,24 +15,24 @@ namespace RecipesMVC4.Tests.ControllerTests
     [TestClass]
     public class AdminControllerTests
     {
-
-        [TestMethod]
-        public void Index_Action_Returns_List_Of_Recipes()
+        IDocumentStore documentStore;
+        IDocumentSession session;
+             
+        [TestInitialize]
+        public void InitialiseTest()
         {
-            using (var documentStore = new EmbeddableDocumentStore
+            documentStore = new EmbeddableDocumentStore
             {
                 RunInMemory = true
-            })
-            {
-                documentStore.Initialize();
+            };
+            documentStore.Initialize();
 
-                using (var session = documentStore.OpenSession())
-                {
+            session = documentStore.OpenSession();
                     var recipe1 = new Recipe
                     {
                         Title = "Title1",
                         Description = "Description1",
-                        ID = 1,
+                        ID = Guid.NewGuid(),
                         isIncorrect = false
                     };
                     session.Store(recipe1);
@@ -39,7 +41,7 @@ namespace RecipesMVC4.Tests.ControllerTests
                     {
                         Title = "Title2",
                         Description = "Description2",
-                        ID = 2,
+                        ID = Guid.NewGuid(),
                         isIncorrect = true
                     };
                     session.Store(recipe2);
@@ -48,7 +50,7 @@ namespace RecipesMVC4.Tests.ControllerTests
                     {
                         Title = "Title3",
                         Description = "Description3",
-                        ID = 3,
+                        ID = Guid.NewGuid(),
                         isIncorrect = false
                     };
                     session.Store(recipe3);
@@ -57,179 +59,91 @@ namespace RecipesMVC4.Tests.ControllerTests
                     {
                         Title = "Title4",
                         Description = "Description4",
-                        ID = 4,
+                        ID = Guid.NewGuid(),
                         isIncorrect = true
                     };
                     session.Store(recipe4);
-
                     session.SaveChanges();
+        }
 
+        [TestCleanup]
+        public void CleanUp()
+        {
+            session.Dispose();
+        }
+            
+        [TestMethod]
+        public void Index_ReturnsListOfRecipes_WhenThereAreRecipesInDB()
+        {
+            //Arrange
                     var adminController = new AdminController(session);
-
+            //Act
                     ViewResult result = adminController.Index() as ViewResult;
-
+            //Assert
                     Assert.IsNotNull(result);
 
-                    //next step
+            //Act
                     var actual = result.Model as List<Recipe>;
                     var expected = session.Query<Recipe>().OrderBy(x => x.ID).ToList();
-
+            //Assert
                     CollectionAssert.AreEqual(actual, expected);
-                    session.Dispose(); 
                 }
-            }
-        }
+            
+        
 
 
         [TestMethod]
-        public void Details_Action_Returns_A_Recipe()
+        public void Details_ReturnsARecipe_WhenTheRecipeIDIsVald()
         {
-            using (var documentStore = new EmbeddableDocumentStore
-            {
-                RunInMemory = true
-            })
-            {
-                documentStore.Initialize();
-
-                using (var session = documentStore.OpenSession())
-                {
-                    var recipe1 = new Recipe
-                    {
-                        Title = "Title1",
-                        Description = "Description1",
-                        ID = 1,
-                        isIncorrect = false
-                    };
-                    session.Store(recipe1);
-
-                    var recipe2 = new Recipe
-                    {
-                        Title = "Title2",
-                        Description = "Description2",
-                        ID = 2,
-                        isIncorrect = true
-                    };
-                    session.Store(recipe2);
-
-                    var recipe3 = new Recipe
-                    {
-                        Title = "Title3",
-                        Description = "Description3",
-                        ID = 3,
-                        isIncorrect = false
-                    };
-                    session.Store(recipe3);
-
-                    var recipe4 = new Recipe
-                    {
-                        Title = "Title4",
-                        Description = "Description4",
-                        ID = 4,
-                        isIncorrect = true
-                    };
-                    session.Store(recipe4);
-
-                    session.SaveChanges();
-
+            //Arrange
                     var adminController = new AdminController(session);
 
-                    var recipeCount = session.Query<Recipe>().Count();
-
-                    ViewResult result = adminController.Details(recipeCount) as ViewResult;
-
+                    var recipe1 = session.Query<Recipe>().SingleOrDefault(x => x.Title == "Title1");
+            //Act
+                    ViewResult result = adminController.Details(recipe1.ID) as ViewResult;
+            //Assert
                     Assert.IsNotNull(result);
-
+            //Act
                     var actual = result.Model as Recipe;
-                    var expected = session.Query<Recipe>().OrderBy(x => x.ID).ToArray()[recipeCount - 1];
-
+                    var expected = session.Query<Recipe>().SingleOrDefault(x => x.ID == recipe1.ID);
+            //Assert
                     Assert.AreEqual(actual, expected);
-                    session.Dispose(); 
-                }
-            }
         }
 
 
         [TestMethod]
-        public void Edit_Action_Returns_A_Recipe_And_Can_Update_A_Recipe()
+        public void Edit_ReturnsARecipeAndCanUpdateARecipe_WhenTheRecipeIDIsValid()
         {
-            using (var documentStore = new EmbeddableDocumentStore
-            {
-                RunInMemory = true
-            })
-            {
-                documentStore.Initialize();
-
-                using (var session = documentStore.OpenSession())
-                {
-                    var recipe1 = new Recipe
-                    {
-                        Title = "Title1",
-                        Description = "Description1",
-                        ID = 1,
-                        isIncorrect = false
-                    };
-                    session.Store(recipe1);
-
-                    var recipe2 = new Recipe
-                    {
-                        Title = "Title2",
-                        Description = "Description2",
-                        ID = 2,
-                        isIncorrect = true
-                    };
-                    session.Store(recipe2);
-
-                    var recipe3 = new Recipe
-                    {
-                        Title = "Title3",
-                        Description = "Description3",
-                        ID = 3,
-                        isIncorrect = false
-                    };
-                    session.Store(recipe3);
-
-                    var recipe4 = new Recipe
-                    {
-                        Title = "Title4",
-                        Description = "Description4",
-                        ID = 4,
-                        isIncorrect = true
-                    };
-                    session.Store(recipe4);
-
-                    session.SaveChanges();
-
+            //Arrange
                     var adminController = new AdminController(session);
 
-                    var recipeCount = session.Query<Recipe>().Count();
-
-                    ViewResult result = adminController.Edit(recipeCount) as ViewResult;
+                    var recipe1 = session.Query<Recipe>().SingleOrDefault(x => x.Title == "Title1");
+            //Act         
+                    ViewResult result = adminController.Edit(recipe1.ID) as ViewResult;
 
                     var actual = result.Model as Recipe;
-                    var expected = session.Query<Recipe>().OrderBy(x => x.ID).ToArray()[recipeCount - 1];
-
+                    var expected = session.Query<Recipe>().SingleOrDefault(x => x.ID == recipe1.ID);
+            //Assert
                     Assert.AreEqual(actual, expected);
 
                     //update step
                     //in admin-mode all fields cand be updated
-                    var updatedRecipe = new Recipe
+            //Arrange
+                    var recipeToUpdate = new Recipe
                     {
                         Title = "UpdatedTitle",
                         Description = "UpdatedDescription",
-                        ID = 4,
+                        ID = recipe1.ID,
                         isIncorrect = false
                     };
-
-                    ViewResult resultOnUpdate = adminController.Edit(updatedRecipe) as ViewResult;
-                    //  Assert.IsNotNull(resultOnUpdate);
-
-                    var expectedAfterUpdate = updatedRecipe;
-                    adminController.Edit(updatedRecipe.ID);
-                    var actualAfterUpdate = session.Query<Recipe>().SingleOrDefault(recipe => recipe.ID == updatedRecipe.ID);
+            //Act
+                    ViewResult resultOnUpdate = adminController.Edit(recipe1.ID) as ViewResult;
+                    var expectedAfterUpdate = recipeToUpdate;
+                    adminController.Edit(recipeToUpdate);
+                    var actualAfterUpdate = session.Query<Recipe>().SingleOrDefault(recipe => recipe.ID == recipeToUpdate.ID);
+            //Assert
                     Assert.AreEqual(actualAfterUpdate, expectedAfterUpdate);
-                    session.Dispose(); 
                 }
             }
         }
-    }
-}
+

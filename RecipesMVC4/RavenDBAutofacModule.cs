@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Autofac;
+﻿using Autofac;
+using Autofac.Integration.Mvc;
 using Raven.Client;
 using Raven.Client.Document;
-using Raven.Client.Embedded;
-using Raven.Database.Server;
-using Autofac.Integration.Mvc;
 using System.Web.Mvc;
-using RecipesMVC4;
 
 
 namespace RecipesMVC4
@@ -34,7 +27,7 @@ namespace RecipesMVC4
 
             builder.Register(x => x.Resolve<IDocumentStore>().OpenSession())
                 .As<IDocumentSession>()
-                .InstancePerLifetimeScope()
+                .InstancePerHttpRequest()
                 .OnRelease(x =>
                 {
                     x.SaveChanges();
